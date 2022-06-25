@@ -2,8 +2,10 @@
 <html>
     <head>
         <meta charset="UTF-8">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <style>
             .row{
                 margin-bottom: 0px;
@@ -17,23 +19,51 @@
             #secondRow{
                 height:93vh;
             }
+            i{
+                margin-top: 10px;
+            }
             
         </style>
     </head>
     <body>
-        <div class="row" id="firstRow" style="border-style:dotted">
-            
-        </div>
-        <div class="row" id="secondRow">
-            <div class="col s9" style="border-style:dotted">
-                <!-- Map here -->
+        <div class="container">
+            <div class="row" id="firstRow" style="border-style:dotted">
+                <!-- Top Nav bar (Play, Search, Timestamp) -->
+                <div class="col s1 offset-s1" style="border-style:dotted">
+                    <i class="medium material-icons">play_arrow</i>
+                </div>
+                <div class="col s6 offset-s1" style="border-style:dotted">
+                    <p>Search</p>
+                </div>
+                <div class="col s1 offset-s1" style="border-style:dotted">
+                    <p>1/1/2020</p>
+                </div>
             </div>
-            <div class="col s3" style="border-style:dotted">
-                <!-- Bar/line chart here -->
+            <div class="row" id="secondRow">
+                <div class="col s9" id="map" style="border-style:dotted">
+                    <!-- Map here -->
+                </div>
+                <div class="col s3" id="chart" style="border-style:dotted">
+                    <!-- Bar/line chart here -->
+                </div>
             </div>
         </div>
+        
     </body>
     <script>
+        function barChart(x){
+            console.log(x)
+        }
+
+        $( "#map" ).click(function() {
+            $("#map").removeClass("s9").addClass("s6")
+            $("#chart").removeClass("s3").addClass("s6")
+        });
+
+        $( "#chart" ).click(function() {
+            $("#map").removeClass("s6").addClass("s9")
+            $("#chart").removeClass("s6").addClass("s3")
+        });
 
     </script>
 </html>
