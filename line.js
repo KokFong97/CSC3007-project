@@ -27,7 +27,6 @@ Promise.all([d3.csv(covidCases)]).then(data => {
     console.log(data);
 
     var lineChart = d3.select("#chart")
-        .append("svg")
         .attr("preserveAspectRatio", "xMidYMid meet")
         .attr(
             'viewBox',
