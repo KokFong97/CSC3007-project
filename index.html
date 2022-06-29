@@ -1,674 +1,356 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Information Visualization MS1</title><style>
-/* cspell:disable-file */
-/* webkit printing magic: print all background colors */
-html {
-	-webkit-print-color-adjust: exact;
-}
-* {
-	box-sizing: border-box;
-	-webkit-print-color-adjust: exact;
-}
-
-html,
-body {
-	margin: 0;
-	padding: 0;
-}
-@media only screen {
-	body {
-		margin: 2em auto;
-		max-width: 900px;
-		color: rgb(55, 53, 47);
-	}
-}
-
-body {
-	line-height: 1.5;
-	white-space: pre-wrap;
-}
-
-a,
-a.visited {
-	color: inherit;
-	text-decoration: underline;
-}
-
-.pdf-relative-link-path {
-	font-size: 80%;
-	color: #444;
-}
-
-h1,
-h2,
-h3 {
-	letter-spacing: -0.01em;
-	line-height: 1.2;
-	font-weight: 600;
-	margin-bottom: 0;
-}
-
-.page-title {
-	font-size: 2.5rem;
-	font-weight: 700;
-	margin-top: 0;
-	margin-bottom: 0.75em;
-}
-
-h1 {
-	font-size: 1.875rem;
-	margin-top: 1.875rem;
-}
-
-h2 {
-	font-size: 1.5rem;
-	margin-top: 1.5rem;
-}
-
-h3 {
-	font-size: 1.25rem;
-	margin-top: 1.25rem;
-}
-
-.source {
-	border: 1px solid #ddd;
-	border-radius: 3px;
-	padding: 1.5em;
-	word-break: break-all;
-}
-
-.callout {
-	border-radius: 3px;
-	padding: 1rem;
-}
-
-figure {
-	margin: 1.25em 0;
-	page-break-inside: avoid;
-}
-
-figcaption {
-	opacity: 0.5;
-	font-size: 85%;
-	margin-top: 0.5em;
-}
-
-mark {
-	background-color: transparent;
-}
-
-.indented {
-	padding-left: 1.5em;
-}
-
-hr {
-	background: transparent;
-	display: block;
-	width: 100%;
-	height: 1px;
-	visibility: visible;
-	border: none;
-	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
-}
-
-img {
-	max-width: 100%;
-}
-
-@media only print {
-	img {
-		max-height: 100vh;
-		object-fit: contain;
-	}
-}
-
-@page {
-	margin: 1in;
-}
-
-.collection-content {
-	font-size: 0.875rem;
-}
-
-.column-list {
-	display: flex;
-	justify-content: space-between;
-}
-
-.column {
-	padding: 0 1em;
-}
-
-.column:first-child {
-	padding-left: 0;
-}
-
-.column:last-child {
-	padding-right: 0;
-}
-
-.table_of_contents-item {
-	display: block;
-	font-size: 0.875rem;
-	line-height: 1.3;
-	padding: 0.125rem;
-}
-
-.table_of_contents-indent-1 {
-	margin-left: 1.5rem;
-}
-
-.table_of_contents-indent-2 {
-	margin-left: 3rem;
-}
-
-.table_of_contents-indent-3 {
-	margin-left: 4.5rem;
-}
-
-.table_of_contents-link {
-	text-decoration: none;
-	opacity: 0.7;
-	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
-}
-
-table,
-th,
-td {
-	border: 1px solid rgba(55, 53, 47, 0.09);
-	border-collapse: collapse;
-}
-
-table {
-	border-left: none;
-	border-right: none;
-}
-
-th,
-td {
-	font-weight: normal;
-	padding: 0.25em 0.5em;
-	line-height: 1.5;
-	min-height: 1.5em;
-	text-align: left;
-}
-
-th {
-	color: rgba(55, 53, 47, 0.6);
-}
-
-ol,
-ul {
-	margin: 0;
-	margin-block-start: 0.6em;
-	margin-block-end: 0.6em;
-}
-
-li > ol:first-child,
-li > ul:first-child {
-	margin-block-start: 0.6em;
-}
-
-ul > li {
-	list-style: disc;
-}
-
-ul.to-do-list {
-	text-indent: -1.7em;
-}
-
-ul.to-do-list > li {
-	list-style: none;
-}
-
-.to-do-children-checked {
-	text-decoration: line-through;
-	opacity: 0.375;
-}
-
-ul.toggle > li {
-	list-style: none;
-}
-
-ul {
-	padding-inline-start: 1.7em;
-}
-
-ul > li {
-	padding-left: 0.1em;
-}
-
-ol {
-	padding-inline-start: 1.6em;
-}
-
-ol > li {
-	padding-left: 0.2em;
-}
-
-.mono ol {
-	padding-inline-start: 2em;
-}
-
-.mono ol > li {
-	text-indent: -0.4em;
-}
-
-.toggle {
-	padding-inline-start: 0em;
-	list-style-type: none;
-}
-
-/* Indent toggle children */
-.toggle > li > details {
-	padding-left: 1.7em;
-}
-
-.toggle > li > details > summary {
-	margin-left: -1.1em;
-}
-
-.selected-value {
-	display: inline-block;
-	padding: 0 0.5em;
-	background: rgba(206, 205, 202, 0.5);
-	border-radius: 3px;
-	margin-right: 0.5em;
-	margin-top: 0.3em;
-	margin-bottom: 0.3em;
-	white-space: nowrap;
-}
-
-.collection-title {
-	display: inline-block;
-	margin-right: 1em;
-}
-
-.simple-table {
-	margin-top: 1em;
-	font-size: 0.875rem;
-	empty-cells: show;
-}
-.simple-table td {
-	height: 29px;
-	min-width: 120px;
-}
-
-.simple-table th {
-	height: 29px;
-	min-width: 120px;
-}
-
-.simple-table-header-color {
-	background: rgb(247, 246, 243);
-	color: black;
-}
-.simple-table-header {
-	font-weight: 500;
-}
-
-time {
-	opacity: 0.5;
-}
-
-.icon {
-	display: inline-block;
-	max-width: 1.2em;
-	max-height: 1.2em;
-	text-decoration: none;
-	vertical-align: text-bottom;
-	margin-right: 0.5em;
-}
-
-img.icon {
-	border-radius: 3px;
-}
-
-.user-icon {
-	width: 1.5em;
-	height: 1.5em;
-	border-radius: 100%;
-	margin-right: 0.5rem;
-}
-
-.user-icon-inner {
-	font-size: 0.8em;
-}
-
-.text-icon {
-	border: 1px solid #000;
-	text-align: center;
-}
-
-.page-cover-image {
-	display: block;
-	object-fit: cover;
-	width: 100%;
-	max-height: 30vh;
-}
-
-.page-header-icon {
-	font-size: 3rem;
-	margin-bottom: 1rem;
-}
-
-.page-header-icon-with-cover {
-	margin-top: -0.72em;
-	margin-left: 0.07em;
-}
-
-.page-header-icon img {
-	border-radius: 3px;
-}
-
-.link-to-page {
-	margin: 1em 0;
-	padding: 0;
-	border: none;
-	font-weight: 500;
-}
-
-p > .user {
-	opacity: 0.5;
-}
-
-td > .user,
-td > time {
-	white-space: nowrap;
-}
-
-input[type="checkbox"] {
-	transform: scale(1.5);
-	margin-right: 0.6em;
-	vertical-align: middle;
-}
-
-p {
-	margin-top: 0.5em;
-	margin-bottom: 0.5em;
-}
-
-.image {
-	border: none;
-	margin: 1.5em 0;
-	padding: 0;
-	border-radius: 0;
-	text-align: center;
-}
-
-.code,
-code {
-	background: rgba(135, 131, 120, 0.15);
-	border-radius: 3px;
-	padding: 0.2em 0.4em;
-	border-radius: 3px;
-	font-size: 85%;
-	tab-size: 2;
-}
-
-code {
-	color: #eb5757;
-}
-
-.code {
-	padding: 1.5em 1em;
-}
-
-.code-wrap {
-	white-space: pre-wrap;
-	word-break: break-all;
-}
-
-.code > code {
-	background: none;
-	padding: 0;
-	font-size: 100%;
-	color: inherit;
-}
-
-blockquote {
-	font-size: 1.25em;
-	margin: 1em 0;
-	padding-left: 1em;
-	border-left: 3px solid rgb(55, 53, 47);
-}
-
-.bookmark {
-	text-decoration: none;
-	max-height: 8em;
-	padding: 0;
-	display: flex;
-	width: 100%;
-	align-items: stretch;
-}
-
-.bookmark-title {
-	font-size: 0.85em;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	height: 1.75em;
-	white-space: nowrap;
-}
-
-.bookmark-text {
-	display: flex;
-	flex-direction: column;
-}
-
-.bookmark-info {
-	flex: 4 1 180px;
-	padding: 12px 14px 14px;
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-}
-
-.bookmark-image {
-	width: 33%;
-	flex: 1 1 180px;
-	display: block;
-	position: relative;
-	object-fit: cover;
-	border-radius: 1px;
-}
-
-.bookmark-description {
-	color: rgba(55, 53, 47, 0.6);
-	font-size: 0.75em;
-	overflow: hidden;
-	max-height: 4.5em;
-	word-break: break-word;
-}
-
-.bookmark-href {
-	font-size: 0.75em;
-	margin-top: 0.25em;
-}
-
-.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
-.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
-.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
-.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
-.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
-.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
-.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
-.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
-.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
-.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
-.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
-.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
-.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
-.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
-.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
-.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
-.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
-.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
-.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
-.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
-.highlight-default {
-	color: rgba(55, 53, 47, 1);
-}
-.highlight-gray {
-	color: rgba(120, 119, 116, 1);
-	fill: rgba(120, 119, 116, 1);
-}
-.highlight-brown {
-	color: rgba(159, 107, 83, 1);
-	fill: rgba(159, 107, 83, 1);
-}
-.highlight-orange {
-	color: rgba(217, 115, 13, 1);
-	fill: rgba(217, 115, 13, 1);
-}
-.highlight-yellow {
-	color: rgba(203, 145, 47, 1);
-	fill: rgba(203, 145, 47, 1);
-}
-.highlight-teal {
-	color: rgba(68, 131, 97, 1);
-	fill: rgba(68, 131, 97, 1);
-}
-.highlight-blue {
-	color: rgba(51, 126, 169, 1);
-	fill: rgba(51, 126, 169, 1);
-}
-.highlight-purple {
-	color: rgba(144, 101, 176, 1);
-	fill: rgba(144, 101, 176, 1);
-}
-.highlight-pink {
-	color: rgba(193, 76, 138, 1);
-	fill: rgba(193, 76, 138, 1);
-}
-.highlight-red {
-	color: rgba(212, 76, 71, 1);
-	fill: rgba(212, 76, 71, 1);
-}
-.highlight-gray_background {
-	background: rgba(241, 241, 239, 1);
-}
-.highlight-brown_background {
-	background: rgba(244, 238, 238, 1);
-}
-.highlight-orange_background {
-	background: rgba(251, 236, 221, 1);
-}
-.highlight-yellow_background {
-	background: rgba(251, 243, 219, 1);
-}
-.highlight-teal_background {
-	background: rgba(237, 243, 236, 1);
-}
-.highlight-blue_background {
-	background: rgba(231, 243, 248, 1);
-}
-.highlight-purple_background {
-	background: rgba(244, 240, 247, 0.8);
-}
-.highlight-pink_background {
-	background: rgba(249, 238, 243, 0.8);
-}
-.highlight-red_background {
-	background: rgba(253, 235, 236, 1);
-}
-.block-color-default {
-	color: inherit;
-	fill: inherit;
-}
-.block-color-gray {
-	color: rgba(120, 119, 116, 1);
-	fill: rgba(120, 119, 116, 1);
-}
-.block-color-brown {
-	color: rgba(159, 107, 83, 1);
-	fill: rgba(159, 107, 83, 1);
-}
-.block-color-orange {
-	color: rgba(217, 115, 13, 1);
-	fill: rgba(217, 115, 13, 1);
-}
-.block-color-yellow {
-	color: rgba(203, 145, 47, 1);
-	fill: rgba(203, 145, 47, 1);
-}
-.block-color-teal {
-	color: rgba(68, 131, 97, 1);
-	fill: rgba(68, 131, 97, 1);
-}
-.block-color-blue {
-	color: rgba(51, 126, 169, 1);
-	fill: rgba(51, 126, 169, 1);
-}
-.block-color-purple {
-	color: rgba(144, 101, 176, 1);
-	fill: rgba(144, 101, 176, 1);
-}
-.block-color-pink {
-	color: rgba(193, 76, 138, 1);
-	fill: rgba(193, 76, 138, 1);
-}
-.block-color-red {
-	color: rgba(212, 76, 71, 1);
-	fill: rgba(212, 76, 71, 1);
-}
-.block-color-gray_background {
-	background: rgba(241, 241, 239, 1);
-}
-.block-color-brown_background {
-	background: rgba(244, 238, 238, 1);
-}
-.block-color-orange_background {
-	background: rgba(251, 236, 221, 1);
-}
-.block-color-yellow_background {
-	background: rgba(251, 243, 219, 1);
-}
-.block-color-teal_background {
-	background: rgba(237, 243, 236, 1);
-}
-.block-color-blue_background {
-	background: rgba(231, 243, 248, 1);
-}
-.block-color-purple_background {
-	background: rgba(244, 240, 247, 0.8);
-}
-.block-color-pink_background {
-	background: rgba(249, 238, 243, 0.8);
-}
-.block-color-red_background {
-	background: rgba(253, 235, 236, 1);
-}
-.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
-.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
-.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
-.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
-.select-value-color-opaquegray { background-color: rgba(255, 255, 255, 0.0375); }
-.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
-.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
-.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
-.select-value-color-yellow { background-color: rgba(253, 236, 200, 1); }
-.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
-
-.checkbox {
-	display: inline-flex;
-	vertical-align: text-bottom;
-	width: 16;
-	height: 16;
-	background-size: 16px;
-	margin-left: 2px;
-	margin-right: 5px;
-}
-
-.checkbox-on {
-	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
-}
-
-.checkbox-off {
-	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
-}
-	
-</style></head><body><article id="4f0457db-2a22-4eaa-9b2f-f9dfe0b352ca" class="page sans"><header><h1 class="page-title">Information Visualization MS1</h1></header><div class="page-body"><h1 id="136087c8-6e77-466e-9bef-fc6ce94d3417" class="">Example 1</h1><p id="0413d609-96ba-4472-9fec-3f0a4b74e095" class="">This unique graph is made by Christine Chan from Reuters to visualize the number of gun deaths in Florida as time goes by. What the graph seems to let viewers perceive is that the number of deaths fell dramatically after the “Stand Your Ground” law was enacted in Florida, when the opposite was the case.</p><p id="31f6c545-6752-4e37-96ec-278adca5c04a" class="">(<a href="https://www.visualisingdata.com/2014/04/the-fine-line-between-confusion-and-deception/">https://www.visualisingdata.com/2014/04/the-fine-line-between-confusion-and-deception/</a>)</p><figure id="f29daa77-7404-4c2e-a98f-2b5c94a6816d" class="image"><a href="Information%20Visualization%20MS1%20f29daa7774044c2ea98f2b5c94a6816d/Untitled.png"><img style="width:604px" src="Information%20Visualization%20MS1%20f29daa7774044c2ea98f2b5c94a6816d/Untitled.png"/></a></figure><p id="334d691f-84a0-461b-abf1-d16a53fc059b" class="">It’s a very unique graph that allows viewers to have many ways to look at it, to the point it sparked political arguments on the web. It was widely derided as bad, misleading, and politically motivated. When our group first saw this chart, we had difficulties understanding the purpose of the chart and what is the storytelling behind it. The reasons can be found in the data and idioms used.</p><h2 id="38be5852-6135-4533-a3a1-e41d53a8b390" class="">Criticism</h2><h3 id="00fc4ea2-3e01-435d-a5c0-b1cb39bcffda" class="">Idiom</h3><ol type="1" id="07e01517-f261-43e4-8c99-3a6f5234a8b0" class="numbered-list" start="1"><li>The idiom chosen here is a line graph with a twist. The graph is inverted with the y axis starting from at the top. The problem with this chart is that it appears that the data is shown in the white area when it is the red area (measured from the top-down). Most viewers will only realise that when they look at the scale on the left.</li></ol><ol type="1" id="764e045b-b44c-4038-9d94-70197df8379b" class="numbered-list" start="2"><li>Looking closer at the graph, it is an area chart from a line graph. It is very confusing as we do not know what kind of information the highlighted red encodes. The highlighted portion of the chart is redundant and contributes to chart junk. After much research, it is found out that Christine Chan was trying to tell a story of how the red represents blood dripping from the top, with more blood representing more death.</li></ol><h3 id="0c9e3570-7d11-428a-893e-3db2fc8cf1b5" class="">Data</h3><ol type="1" id="8bbf411f-b96c-4125-88bc-42212037fd72" class="numbered-list" start="1"><li>When it comes to representing the trend of gun deaths in Florida, would a normal line graph be better without it being inverted? It boils down to the storytelling of this chart and it is not doing a good job due to the title “Number of murders committed using firearms”. Maybe a different title would help the users perceive the ups and downs of the graph.</li></ol><ol type="1" id="21a890cf-44e4-4821-8e50-3c505183c4f4" class="numbered-list" start="2"><li>Another part is the visual design of annotation. The viewers would read the white area as the foreground and the red area as the background. That is helped by the X-axis at the bottom and the annotation, which sits on top of what is the chart area, rather than in the white background. Moving the annotation and changing that bottom line would likely have made it much easier to read the chart correctly.</li></ol><h3 id="7301588a-7243-4759-a45a-32bca85a57e1" class="">Improvement</h3><ol type="1" id="e98d0333-325d-413a-8530-9ec35917cc0a" class="numbered-list" start="1"><li>If the storytelling is to show the red areas as blood, having a bar chart facing down might be better instead of a line graph.</li></ol><ol type="1" id="b7059021-3305-4809-a4a1-6743683ea8de" class="numbered-list" start="2"><li>Have a good title to resonate with the users when they first see the chart. “Iraq’s bloody toll” is better than “Gun deaths in Florida”.</li></ol><ol type="1" id="6ba40c0e-0448-4931-ba82-95df401fa982" class="numbered-list" start="3"><li>Have the X-axis start at the top so that the viewers would not misinterpret it as a normal chart.</li></ol><figure id="1fe2137d-04f4-4c34-a522-f7c9b35f7d97" class="image"><a href="https://media.discordapp.net/attachments/980773000288804915/988447325678633001/unknown4.png?width=663&height=910"><img src="https://media.discordapp.net/attachments/980773000288804915/988447325678633001/unknown4.png?width=663&height=910"/></a></figure><h1 id="fcac0890-db84-4f7a-87a3-d3a1aad0c382" class="">Example 2</h1><p id="eeb5cb78-7d06-4cd4-a020-d6c438614270" class="">The idea for this chart is to present the gap between China and the US for the % share of Philippine imports and exports. This is shown from both lines representing China and the US drawing closer towards each other to a similar level of percentage share in Philippines imports and exports.</p><figure id="44bc5ceb-31ac-45d4-823a-b40437b98ed0" class="image"><a href="Information%20Visualization%20MS1%20f29daa7774044c2ea98f2b5c94a6816d/Untitled%201.png"><img style="width:1219px" src="Information%20Visualization%20MS1%20f29daa7774044c2ea98f2b5c94a6816d/Untitled%201.png"/></a></figure><h2 id="0fe4ebf1-a399-41f4-96b9-a9bdf1bdfbb6" class="">Criticism</h2><h3 id="360112fc-5dab-44d6-816e-2e15015e7498" class="">Idioms</h3><ol type="1" id="62010526-5cea-4e14-b47d-d3cf5252cc44" class="numbered-list" start="1"><li>The idiom uses a connected scatterplot, an uncommon chart that is unintuitive and can cause confusion.
-
-The chart gives the impression of a line chart with time-series data but it does not follow the structure of a conventional timeline chart. Both axes are independent of time so the direction of the lines should be emphasised more, such as marking as an arrow.
-
-The chart can also be perceived as a scatterplot. The purpose of a scatter plot is to observe the relation between two variables, further reinforced by an optional trend line. However, in this case, the line that separates the exports and imports can be mistaken for a trend line.</li></ol><ol type="1" id="9dea17a5-ac4c-4a27-acab-316d6da4ccb4" class="numbered-list" start="2"><li>There is a lack of a clear chronological order that takes a while to perceive. Viewers have a perceived notion to view time chronologically from left to right. The years are not ordered sequentially and are scattered all around, which makes it hard to view the trend chronologically. For example, we could not tell that there was a change in US data from the year 2010 to 2011.</li></ol><h3 id="44138004-a725-485a-ba2a-ac68d1f05ad4" class="">Data</h3><ol type="1" id="17bd1976-a895-41b7-a7f7-b39e64744475" class="numbered-list" start="1"><li>The general nature of a connected scatterplot can present datasets as a cluttered mess. The text labels also further clutter the area. In a traditional line graph, trends can be seen easily, either increasing or decreasing. However, in a connected scatterplot, it is difficult to see the correlation between the two axes. For example, from the year 2004 to 2010 in China, we can see that something was happening, but we cannot tell exactly what was happening.</li></ol><ol type="1" id="cb008864-cc06-4e9b-9ad6-36ac63901bf2" class="numbered-list" start="2"><li>A connected scatterplot can be an alternative to dual-axis charts when the axes are not of the same scale. The data for the two variables in this chart uses the same scale. Thus, a normal line chart with the same scale would suffice.</li></ol><ol type="1" id="8549ab74-2c3c-415b-b5ea-196dbbba90a8" class="numbered-list" start="3"><li>The axis labels are in % and the title is also in %, which implies that the axis is showing % of % which does not make sense.</li></ol><h3 id="59f5787a-e4d8-4958-ab04-dec833a5f9a7" class="">Improvements</h3><ol type="1" id="364f6722-7165-47e0-9bed-5ed7f9d4df1c" class="numbered-list" start="1"><li>The Y-axis should be “shares in the Philippines (%)” and the X-axis should be “year (2000-2012)” with 4 lines(light blue, dark blue, light red, dark red). Red to describe China imports/exports and Blue to describe US import/exports while a lighter shade of a colour to describe the imports and a darker shade to describe the exports.</li></ol><ol type="1" id="48ade0b4-3ff4-4174-9dff-9b2cdc235ce2" class="numbered-list" start="2"><li>The word “more exports” and “more imports” at the top left and bottom right of the chart serves no purpose and should be removed. If you need to label which areas are more or less, it is probably not that intuitive.</li></ol><ol type="1" id="7a758b2c-4acb-4c03-9923-847a1e1cd620" class="numbered-list" start="3"><li>There should be a legend for the colours to denote the countries so that the labels are not competing with the limited space in the chart.</li></ol><ol type="1" id="8ac6c410-1a79-477c-a507-7fe0339dc915" class="numbered-list" start="4"><li>The labels in the axis should not have any units as the axis title should already have the units.</li></ol><figure id="4404dadd-7b2b-4796-948d-81246c8a27de" class="image"><a href="Information%20Visualization%20MS1%20f29daa7774044c2ea98f2b5c94a6816d/Untitled%202.png"><img style="width:2340px" src="Information%20Visualization%20MS1%20f29daa7774044c2ea98f2b5c94a6816d/Untitled%202.png"/></a></figure><p id="75e3a19f-32bd-4b66-93a0-e2bba6a73c2b" class="">
-</p></div></article></body></html>
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<title>reveal.js</title>
+
+	<link rel="stylesheet" href="dist/reset.css">
+	<link rel="stylesheet" href="dist/reveal.css">
+	<link rel="stylesheet" href="dist/theme/night.css">
+
+	<!-- Theme used for syntax highlighted code -->
+	<link rel="stylesheet" href="plugin/highlight/monokai.css">
+
+	<style>
+		.container {
+			display: flex;
+		}
+
+		.col {
+			flex: 1;
+		}
+
+		b {
+			color: #4169E0;
+		}
+
+		ul li {
+			padding: 0px 0px;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="reveal">
+		<div class="slides">
+
+			<!-- SLIDE 1 -->
+			<section data-transition="none">
+				<h3>Information Visualization Milestone 1</h3>
+				<p><small>Lim Kok Fong <br>
+						Zainul Ariffin <br>
+						Yuan Wei</small></p>
+
+				<hr>
+				<small><a href="https://kokfong97.github.io/CSC3007-project/index2.html" target="_blank">Click here for
+						the document</a></small>
+			</section>
+
+			<!-- VIZ 1-->
+			</section>
+			<section data-transition="none">
+				<h3>
+					Visualization 1
+				</h3>
+				<hr />
+				<p><small>Gun deaths in Florida</small></p>
+			</section>
+
+			<section data-transition="none">
+				<img src="img/Viz1a.png" height="650">
+			</section>
+
+			<section data-transition="none">
+				<h5>Data</h5>
+				<hr />
+				<div class="container">
+					<div class="col">
+						<img src="img/Viz1a.png">
+					</div>
+					<div class="col">
+						<small>
+							<p>
+							<ul>
+								<li><b>Interval: </b>Time series from 1990 and beyond</li>
+								<br />
+								<li><b>Ratio: </b> Number of murders committed using firearms</li>
+								<br/>
+								<li><b>Ratio: </b> Highlighted area represent level of deaths</li>
+								
+							</ul>
+							</p>
+						</small>
+					</div>
+				</div>
+			</section>
+
+			<section data-transition="none">
+				<h5>Idiom</h5>
+				<hr />
+				<div class="container">
+					<div class="col">
+						<img src="img/Viz1a.png">
+					</div>
+					<div class="col">
+						<small>
+							<p>
+							<ul>
+								<li><b>Line graph</b> representing a trend</li>
+								<br />
+								<li>The graph is also an <b>area chart</b></li>
+								<br />
+								<li>X and Y-Axis for number of murder as years goes on </li>
+								<br />
+								<li>Graph is <b>inverted</b> with the y-axis starting from the top</li>
+								<br />
+							</ul>
+							</p>
+						</small>
+					</div>
+				</div>
+			</section>
+			<section data-transition="none">
+				<section data-transition="none">
+					<h5>Criticisms</h5>
+					<hr />
+					<div class="container">
+						<div class="col">
+							<img src="img/Viz1a.png">
+						</div>
+						<div class="col">
+
+							<small>
+								<p>
+								<ul>
+									<li>Graph is <b>misleading</b> due to graph being inverted. User wouldn't know its inverted and there is red/white misconception.</li><br>
+									<li><b>X-axis</b> at the bottom doesnt help at all in an inverted chart. It will only mislead the users more</li><br>
+									<li><b>Annotation</b> will lead the users to think the red is the background.</li><br>
+									<li>The idiom used is <b>confusing</b>. What does the red area encodes?</li><br>
+									<li>Intended <b>story telling</b> is not conveyed to the users. Due to how the "red" dont look like blood</li><br>
+								</ul>
+								</p>
+							</small>
+						</div>
+					</div>
+				</section>
+				<section data-transition="none">
+					<h5>Criticisms</h5>
+					<hr />
+					<div class="container">
+						<div class="col">
+							<img src="img/Viz1a.png">
+						</div>
+						<div class="col">
+
+							<small>
+								<p>
+								<ul>
+									<li>Intended <b>story telling</b> is not conveyed to the users. Due to how the "red" dont look like blood</li><br>
+									<li>It’s a very unique graph that allows viewers to have many ways to look at it, to the point it sparked <b>political arguments</b> on the web. It was widely derided as bad, misleading, and politically motivated.</li><br>
+								</ul>
+								</p>
+							</small>
+						</div>
+					</div>
+				</section>
+			
+			</section>
+			<section data-transition="none">
+				<h3>
+					Visualization 1 Improvements
+				</h3>
+			</section>
+
+			<section data-transition="none">
+				<h5>Improvements</h5>
+				<hr />
+				<div class="container">
+					<div class="col">
+						<img src="img/Viz1b.png" height="550">
+					</div>
+					<div class="col">
+						<small>
+							<p style="text-align: left;">
+								A better way to do it
+							</p>
+							<ul>
+								<li>Have a more representative title</li>
+								<br />
+								<li>X-axis at the top to orientate the chart clearly</li>
+								<br />
+								<li>Having a barchart would be a better representation of blood dripping than line chart
+								</li>
+							</ul>
+						</small>
+					</div>
+				</div>
+			</section>
+
+			<!-- VIZ 2-->
+			<section data-transition="none">
+				<h3>
+					Visualization 2
+				</h3>
+				<hr />
+				<p><small>US and China in Philippine Foreign Trade</small></p>
+			</section>
+
+			<section data-transition="none">
+				<img src="img/Viz2a.png" height="650">
+			</section>
+
+			<section data-transition="none">
+				<h5>Data</h5>
+				<hr />
+				<div class="container">
+					<div class="col">
+						<img src="img/Viz2a.png">
+					</div>
+					<div class="col">
+						<small>
+							<p>
+							<ul>
+								<li><b>Nominal:</b> US & China</li>
+								<br />
+								<li><b>Interval: </b>Time series from 2000 to 2012</li>
+								<br />
+								<li><b>Ratio: </b> Share in Philippine Imports</li>
+								<br />
+								<li><b>Ratio: </b>Share in Philippine Exports </li>
+							</ul>
+							</p>
+						</small>
+					</div>
+				</div>
+			</section>
+
+			<section data-transition="none">
+				<h5>Idiom</h5>
+				<hr />
+				<div class="container">
+					<div class="col">
+						<img src="img/Viz2a.png">
+					</div>
+					<div class="col">
+						<small>
+							<p>
+							<ul>
+								<li>A connected scatterplot</li>
+								<br />
+								<li>X and Y-Axis for Imports and Exports </li>
+								<br />
+								<li>Norminal color scale for US and China</li>
+								<br />
+								<li>Labelled zones (More Imports/Exports)</li>
+								<br />
+							</ul>
+							</p>
+						</small>
+					</div>
+				</div>
+			</section>
+			<section data-transition="none">
+				<section data-transition="none">
+					<h5>Criticisms</h5>
+					<hr />
+					<div class="container">
+						<div class="col">
+							<img src="img/Viz2a.png">
+						</div>
+						<div class="col">
+							<small>
+								<p>
+								<ul>
+									<li>A connected scatterplot is uncommon and can be <b>unintuitive.</b></li>
+									<br />
+									<li>We are wired to read time from left to right. Time goes in all directions here.
+									</li>
+									<br />
+									<li>Connected scatterplot can be very messy, and <b>trends can be hard to see.</b>
+									</li>
+									<br />
+									<li>A connected scatterplot is an alternative for dual-axis charts with <b>different
+											scales.</b></li>
+									<br />
+									<li>However, the axes here are <b>using the same scale.</b></li>
+								</ul>
+								</p>
+							</small>
+						</div>
+					</div>
+				</section>
+				<section data-transition="none">
+					<h5>Criticisms</h5>
+					<hr />
+					<div class="container">
+						<div class="col">
+							<img src="img/Viz2a.png">
+						</div>
+						<div class="col">
+							<small>
+								<p>
+								<ul>
+									<li>The dotted line can be mistaken as a trend line.</li>
+									<br />
+									<li>The Axes are labelled % twice.</li>
+									<br />
+									<li>The labelled zones are redundant.</li>
+									<br />
+								</ul>
+								</p>
+							</small>
+						</div>
+					</div>
+				</section>
+			</section>
+
+			<section data-transition="none">
+				<h3>
+					Visualization 2 Improvements
+				</h3>
+			</section>
+
+			<section data-transition="none">
+				<h5>Improvements</h5>
+				<hr />
+				<img src="img/Viz2b.png" height="350">
+				<p>
+				<ul>
+					<small>
+						<li>Can be represented better with a line chart</li>
+						<li>Either use units in the axis or each label in axis</li>
+						<li>There should be a legend for the colours to denote the countries instead of writing it in
+							the chart</li>
+						<li>The word “more exports” and “more imports” at the top left and bottom right of the chart
+							serves no purpose and can be removed</li>
+					</small>
+				</ul>
+				</p>
+			</section>
+
+			<section data-transition="none">
+				<h1>THE END</h1>
+			</section>
+		</div>
+	</div>
+
+	<script src="dist/reveal.js"></script>
+	<script src="plugin/notes/notes.js"></script>
+	<script src="plugin/markdown/markdown.js"></script>
+	<script src="plugin/highlight/highlight.js"></script>
+	<script>
+		// More info about initialization & config:
+		// - https://revealjs.com/initialization/
+		// - https://revealjs.com/config/
+		Reveal.initialize({
+			hash: true,
+			// Learn about plugins: https://revealjs.com/plugins/
+			plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+		});
+	</script>
+</body>
+
+</html>

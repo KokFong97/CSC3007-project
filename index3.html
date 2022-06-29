@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+        <style>
+            .row{
+                margin-bottom: 0px;
+            }
+            .col{
+                height: 100%;
+            }
+            #firstRow{
+                height: 7vh;
+            }
+            #secondRow{
+                height:93vh;
+            }
+            i{
+                margin-top: 10px;
+            }
+            
+        </style>
+    </head>
+    <body>
+        <div class="row" id="firstRow" style="border-style:dotted">
+            <!-- Top Nav bar (Play, Search, Timestamp) -->
+            <div class="col s1 offset-s1" style="border-style:dotted">
+                <i class="medium material-icons">play_arrow</i>
+            </div>
+            <div class="col s6 offset-s1" style="border-style:dotted">
+                <p>Search</p>
+            </div>
+            <div class="col s1 offset-s1" style="border-style:dotted">
+                <p>1/1/2020</p>
+            </div>
+        </div>
+        <div class="row" id="secondRow">
+            <div class="col s9" id="mapDiv" style="border-style:dotted">
+                <!-- Map here -->
+            </div>
+            <div class="col s3" id="chartDiv" style="border-style:dotted">
+                <!-- Bar/line chart here -->
+                <svg id="chart" style="border-style:dotted"></svg>
+            </div>
+        </div>
+        
+    </body>
+    <script>
+        initSVG();
+
+        function initSVG(){
+            resizeSVG()
+            plotMap()
+            plotBar()
+        }
+        
+        function resizeSVG(){
+            var element = document.getElementById('chartDiv');
+            var positionInfo = element.getBoundingClientRect();
+            var height = positionInfo.height;
+            var width = positionInfo.width;
+        
+            let margin = {top: 20, right: 20, bottom: 20, left: 20};
+            width = width - margin.left - margin.right,
+            height = height - margin.top - margin.bottom;
+
+            d3.select("#chart")
+            .style("height",height)
+            .style("width",width)
+        }
+
+        $( "#mapDiv" ).click(function() {
+            $("#mapDiv").removeClass("s9").addClass("s6")
+            $("#chartDiv").removeClass("s3").addClass("s6")
+            resizeSVG()
+            plotLine();
+        });
+
+        $( "#chartDiv" ).click(function() {
+            $("#mapDiv").removeClass("s6").addClass("s9")
+            $("#chartDiv").removeClass("s6").addClass("s3")
+            resizeSVG()
+            plotBar()
+        });
+
+        function plotMap(){
+
+        }
+
+        function plotBar(){
+            
+        }
+
+        function plotLine(){
+
+        }
+
+    </script>
+</html>
