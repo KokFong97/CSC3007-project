@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <style>
+        .row {
+            margin-bottom: 0px;
+        }
+
+        .col {
+            height: 100%;
+        }
+
+        #firstRow {
+            height: 7vh;
+        }
+
+        #secondRow {
+            height: 93vh;
+        }
+
+        i {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="row" id="firstRow" style="border-style:dotted">
+        <!-- Top Nav bar (Play, Search, Timestamp) -->
+        <div class="col s1 offset-s1" style="border-style:dotted">
+            <i class="medium material-icons">play_arrow</i>
+        </div>
+        <div class="col s6 offset-s1" style="border-style:dotted">
+            <p>Search</p>
+        </div>
+        <div class="col s1 offset-s1" style="border-style:dotted">
+            <p>1/1/2020</p>
+        </div>
+    </div>
+    <div class="row" id="secondRow">
+        <div class="col s9" id="mapDiv" style="border-style:dotted">
+            <!-- Map here -->
+        </div>
+        <div class="col s3" id="chartDiv" style="border-style:dotted">
+            <!-- Bar/line chart here -->
+            <svg id="chart" style="border-style:dotted"></svg>
+        </div>
+    </div>
+
+</body>
+<script>
+
+    obj = {
+        "china": [{
+            date: "2020-01-01",
+            total_cases: 10
+        },
+        {
+            date: "2020-01-02",
+            total_cases: 22
+        },
+        {
+            date: "2020-01-03",
+            total_cases: 45
+        },
+        {
+            date: "2020-01-04",
+            total_cases: 114
+        }]
+        ,
+        "singapore": [{
+            date: "2020-01-01",
+            total_cases: 16
+        },
+        {
+            date: "2020-01-02",
+            total_cases: 17
+        },
+        {
+            date: "2020-01-03",
+            total_cases: 18
+        }]
+    }
+
+    initSVG();
+
+    function initSVG() {
+        var dimension = resizeSVG();
+        plotMap()
+        plotLine(obj, "2020-01-03", "china", dimension.height, dimension.width)
+    }
+
+    function resizeSVG() {
+        var element = document.getElementById('chartDiv');
+        var positionInfo = element.getBoundingClientRect();
+        var height = positionInfo.height;
+        var width = positionInfo.width;
+
+        let margin = { top: 20, right: 20, bottom: 20, left: 20 };
+            width = width - margin.left - margin.right,
+            height = height - margin.top - margin.bottom;
+
+        d3.select("#chart")
+            .style("height", height)
+            .style("width", width)
+
+        return { height: height, width: width}
+    }
+
+    $("#mapDiv").click(function () {
+        $("#mapDiv").removeClass("s9").addClass("s6")
+        $("#chartDiv").removeClass("s3").addClass("s6")
+        resizeSVG()
+        plotLine();
+    });
+
+    $("#chartDiv").click(function () {
+        $("#mapDiv").removeClass("s6").addClass("s9")
+        $("#chartDiv").removeClass("s6").addClass("s3")
+        resizeSVG()
+        plotBar()
+    });
+
+    function plotMap() {
+
+    }
+
+    function plotBar() {
+
+    }
+
+    function plotLine(data, date, country, height, width) {
+
+        let attribute = "total_cases"
+
+        var latestDate = new Date(date);
+        var data = data[country].filter(d => {
+            var date = new Date(d.date);
+            return (date <= latestDate);
+        });
+
+        console.log(data);
+
+        var parseDate = d3.timeParse("%Y-%m-%d");
+        data.forEach(function (d) {
+            d.date = parseDate(d.date);
+        });
+
+        var lineChart = d3.select("#chart")
+            // .attr("preserveAspectRatio", "xMidYMid meet")
+            // .attr(
+            //     'viewBox',
+            //     '0 0 ' +
+            //     (width + margin.left + margin.right) +
+            //     ' ' +
+            //     (height + margin.top + margin.bottom)
+            // )
+            // .append("g")
+            // .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        // Add title
+        lineChart.append("text")
+            .attr("x", width / 2)
+            .attr("y", 0)
+            .attr("text-anchor", "middle")
+            .style("font-size", "16px")
+            .text(country + "\n " + attribute.replace("_", " "));
+
+        // Add scales
+        var xScale = d3.scaleTime()
+            .domain(d3.extent(data, function (d) { return d.date; }))
+            .range([0, width]);
+
+        var yScale = d3.scaleLinear()
+            .domain([0, d3.max(data, function (d) { return +d[attribute]; })])
+            .range([height, 0]);
+
+        // Add x-axis
+        lineChart.append("g")
+            .data(data)
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(xScale)
+                .tickFormat(d3.timeFormat("%Y-%m-%d"))
+            )
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("transform", "rotate(-38)");
+
+        // Add y-axis
+        lineChart.append("g")
+            .attr("class", "y axis")
+            .call(d3.axisLeft(yScale));
+
+            /*
+
+        // Draw
+        lineChart.append("path")
+            .datum(data)
+            .attr("fill", "none")
+            .attr("stroke", "royalblue")
+            .attr("stroke-width", 1.5)
+            .attr("d", d3.line()
+                .x(function (d) { return xScale(d.date) })
+                .y(function (d) { return yScale(+d[attribute]) })
+            )
+
+        // lineChart.append("path")
+        //     .datum(data)
+        //     .attr("fill", "none")
+        //     .attr("stroke", "violet")
+        //     .attr("stroke-width", 1.5)
+        //     .attr("d", d3.line()
+        //         .x(function (d) { return xScale(d.date) })
+        //         .y(function (d) { return yScale(+d.new_cases) })
+        //     )
+*/
+        return;
+    }
+
+</script>
+
+</html>

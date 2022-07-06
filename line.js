@@ -24,8 +24,6 @@ Promise.all([d3.csv(covidCases)]).then(data => {
         d.date = parseDate(d.date);
     });
 
-    console.log(data);
-
     var lineChart = d3.select("#chart")
         .attr("preserveAspectRatio", "xMidYMid meet")
         .attr(
