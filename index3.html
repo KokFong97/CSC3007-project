@@ -56,46 +56,30 @@
     </div>
 
 </body>
+
 <script>
 
-    obj = {
-        "china": [{
-            date: "2020-01-01",
-            total_cases: 10
-        },
-        {
-            date: "2020-01-02",
-            total_cases: 22
-        },
-        {
-            date: "2020-01-03",
-            total_cases: 45
-        },
-        {
-            date: "2020-01-04",
-            total_cases: 114
-        }]
-        ,
-        "singapore": [{
-            date: "2020-01-01",
-            total_cases: 16
-        },
-        {
-            date: "2020-01-02",
-            total_cases: 17
-        },
-        {
-            date: "2020-01-03",
-            total_cases: 18
-        }]
-    }
+    Promise.all([d3.json("covid_data_2.json")]).then(data => {
 
-    initSVG();
+        $("#mapDiv").click(function () {
+            $("#mapDiv").removeClass("s9").addClass("s6");
+            $("#chartDiv").removeClass("s3").addClass("s6");
+            var dimensions = resizeSVG();
+            plotLine(data[0], "2020-05-25", "China", dimensions);
+        });
 
-    function initSVG() {
-        var dimension = resizeSVG();
-        plotMap()
-        plotLine(obj, "2020-01-03", "china", dimension.height, dimension.width)
+        $("#chartDiv").click(function () {
+            $("#mapDiv").removeClass("s6").addClass("s9");
+            $("#chartDiv").removeClass("s6").addClass("s3");
+            resizeSVG();
+            plotBar();
+        });
+    });
+
+    function initSVG(data) {
+        plotMap();
+        plotBar();
+        return resizeSVG();
     }
 
     function resizeSVG() {
@@ -104,67 +88,56 @@
         var height = positionInfo.height;
         var width = positionInfo.width;
 
-        let margin = { top: 20, right: 20, bottom: 20, left: 20 };
-            width = width - margin.left - margin.right,
+        let margin = { top: 100, right: 100, bottom: 100, left: 100 };
+        width = width - margin.left - margin.right,
             height = height - margin.top - margin.bottom;
 
         d3.select("#chart")
             .style("height", height)
             .style("width", width)
 
-        return { height: height, width: width}
+        return { margin: margin, height: height, width: width }
     }
-
-    $("#mapDiv").click(function () {
-        $("#mapDiv").removeClass("s9").addClass("s6")
-        $("#chartDiv").removeClass("s3").addClass("s6")
-        resizeSVG()
-        plotLine();
-    });
-
-    $("#chartDiv").click(function () {
-        $("#mapDiv").removeClass("s6").addClass("s9")
-        $("#chartDiv").removeClass("s6").addClass("s3")
-        resizeSVG()
-        plotBar()
-    });
 
     function plotMap() {
 
     }
 
     function plotBar() {
-
+        d3.selectAll("#chart > *").remove();
     }
 
-    function plotLine(data, date, country, height, width) {
+    function plotLine(data, date, country, dimensions) {
 
+        let margin = dimensions.margin;
+        let height = dimensions.height;
+        let width = dimensions.width;
         let attribute = "total_cases"
 
+        let cloneData = JSON.parse(JSON.stringify(data));
+
         var latestDate = new Date(date);
-        var data = data[country].filter(d => {
-            var date = new Date(d.date);
+        cloneData = cloneData[country].filter(d => {
+            let date = new Date(d.date);
             return (date <= latestDate);
         });
 
-        console.log(data);
-
         var parseDate = d3.timeParse("%Y-%m-%d");
-        data.forEach(function (d) {
+        cloneData.forEach(function (d) {
             d.date = parseDate(d.date);
         });
 
         var lineChart = d3.select("#chart")
-            // .attr("preserveAspectRatio", "xMidYMid meet")
-            // .attr(
-            //     'viewBox',
-            //     '0 0 ' +
-            //     (width + margin.left + margin.right) +
-            //     ' ' +
-            //     (height + margin.top + margin.bottom)
-            // )
-            // .append("g")
-            // .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            .attr("preserveAspectRatio", "xMidYMid meet")
+            .attr(
+                'viewBox',
+                '0 0 ' +
+                (width + margin.left + margin.right) +
+                ' ' +
+                (height + margin.top + margin.bottom)
+            )
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         // Add title
         lineChart.append("text")
@@ -176,16 +149,16 @@
 
         // Add scales
         var xScale = d3.scaleTime()
-            .domain(d3.extent(data, function (d) { return d.date; }))
+            .domain(d3.extent(cloneData, function (d) { return d.date; }))
             .range([0, width]);
 
         var yScale = d3.scaleLinear()
-            .domain([0, d3.max(data, function (d) { return +d[attribute]; })])
+            .domain([0, d3.max(cloneData, function (d) { return +d[attribute]; })])
             .range([height, 0]);
 
         // Add x-axis
         lineChart.append("g")
-            .data(data)
+            .data(cloneData)
             .attr("class", "x axis")
             .attr("transform", "translate(0," + height + ")")
             .call(d3.axisBottom(xScale)
@@ -200,11 +173,9 @@
             .attr("class", "y axis")
             .call(d3.axisLeft(yScale));
 
-            /*
-
         // Draw
         lineChart.append("path")
-            .datum(data)
+            .datum(cloneData)
             .attr("fill", "none")
             .attr("stroke", "royalblue")
             .attr("stroke-width", 1.5)
@@ -212,17 +183,6 @@
                 .x(function (d) { return xScale(d.date) })
                 .y(function (d) { return yScale(+d[attribute]) })
             )
-
-        // lineChart.append("path")
-        //     .datum(data)
-        //     .attr("fill", "none")
-        //     .attr("stroke", "violet")
-        //     .attr("stroke-width", 1.5)
-        //     .attr("d", d3.line()
-        //         .x(function (d) { return xScale(d.date) })
-        //         .y(function (d) { return yScale(+d.new_cases) })
-        //     )
-*/
         return;
     }
 
