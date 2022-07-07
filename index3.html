@@ -68,7 +68,7 @@
     </div>
     <div class="row" id="secondRow">
         <div class="col s9" id="mapDiv" style="border-style:dotted">
-
+            <!-- Map here -->
         </div>
         <div class="col s3" id="chartDiv" style="border-style:dotted">
             <!-- Bar/line chart here -->
@@ -78,6 +78,46 @@
 
 </body>
 <script>
+
+    obj = {
+        "china": [{
+            date: "2020-01-01",
+            total_cases: 10
+        },
+        {
+            date: "2020-01-02",
+            total_cases: 22
+        },
+        {
+            date: "2020-01-03",
+            total_cases: 45
+        },
+        {
+            date: "2020-01-04",
+            total_cases: 114
+        }]
+        ,
+        "singapore": [{
+            date: "2020-01-01",
+            total_cases: 16
+        },
+        {
+            date: "2020-01-02",
+            total_cases: 17
+        },
+        {
+            date: "2020-01-03",
+            total_cases: 18
+        }]
+    }
+
+    initSVG();
+
+    function initSVG() {
+        var dimension = resizeSVG();
+        plotMap()
+        plotLine(obj, "2020-01-03", "china", dimension.height, dimension.width)
+    }
 
     function resizeSVG() {
         var element = document.getElementById('chartDiv');
@@ -92,8 +132,16 @@
         d3.select("#chart")
             .style("height", height)
             .style("width", width)
+
+        return { height: height, width: width }
     }
 
+    $("#mapDiv").click(function () {
+        $("#mapDiv").removeClass("s9").addClass("s6")
+        $("#chartDiv").removeClass("s3").addClass("s6")
+        resizeSVG()
+        plotLine();
+    });
     $(function () {
         var isDragging = false;
         $("#mapDiv")
@@ -154,7 +202,7 @@
                                     color: 'blue',
                                     fillOpacity: 0.1
                                 });
-                                $(".whiteDiv").html(feature.properties.ADMIN);
+                                $(".textArea").html(feature.properties.ADMIN);
                                 if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
                                     layer.bringToFront();
                                 }
@@ -201,7 +249,7 @@
             // white div bottom right
             var textArea = L.control({ position: 'bottomright' });
             textArea.onAdd = function (map) {
-                this._div = L.DomUtil.create('div', 'whiteDiv');
+                this._div = L.DomUtil.create('div', 'textArea');
 
                 return this._div;
             };
@@ -239,20 +287,98 @@
 
     }
 
-
     function plotBar() {
 
     }
 
-    function plotLine() {
+    function plotLine(data, date, country, height, width) {
 
+        let attribute = "total_cases"
+
+        var latestDate = new Date(date);
+        var data = data[country].filter(d => {
+            var date = new Date(d.date);
+            return (date <= latestDate);
+        });
+
+        console.log(data);
+
+        var parseDate = d3.timeParse("%Y-%m-%d");
+        data.forEach(function (d) {
+            d.date = parseDate(d.date);
+        });
+
+        var lineChart = d3.select("#chart")
+        // .attr("preserveAspectRatio", "xMidYMid meet")
+        // .attr(
+        //     'viewBox',
+        //     '0 0 ' +
+        //     (width + margin.left + margin.right) +
+        //     ' ' +
+        //     (height + margin.top + margin.bottom)
+        // )
+        // .append("g")
+        // .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        // Add title
+        lineChart.append("text")
+            .attr("x", width / 2)
+            .attr("y", 0)
+            .attr("text-anchor", "middle")
+            .style("font-size", "16px")
+            .text(country + "\n " + attribute.replace("_", " "));
+
+        // Add scales
+        var xScale = d3.scaleTime()
+            .domain(d3.extent(data, function (d) { return d.date; }))
+            .range([0, width]);
+
+        var yScale = d3.scaleLinear()
+            .domain([0, d3.max(data, function (d) { return +d[attribute]; })])
+            .range([height, 0]);
+
+        // Add x-axis
+        lineChart.append("g")
+            .data(data)
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(xScale)
+                .tickFormat(d3.timeFormat("%Y-%m-%d"))
+            )
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("transform", "rotate(-38)");
+
+        // Add y-axis
+        lineChart.append("g")
+            .attr("class", "y axis")
+            .call(d3.axisLeft(yScale));
+
+        /*
+
+    // Draw
+    lineChart.append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", "royalblue")
+        .attr("stroke-width", 1.5)
+        .attr("d", d3.line()
+            .x(function (d) { return xScale(d.date) })
+            .y(function (d) { return yScale(+d[attribute]) })
+        )
+
+    // lineChart.append("path")
+    //     .datum(data)
+    //     .attr("fill", "none")
+    //     .attr("stroke", "violet")
+    //     .attr("stroke-width", 1.5)
+    //     .attr("d", d3.line()
+    //         .x(function (d) { return xScale(d.date) })
+    //         .y(function (d) { return yScale(+d.new_cases) })
+    //     )
+*/
+        return;
     }
-
-    $(document).ready(function () {
-        resizeSVG()
-        plotMap()
-        plotBar()
-    });
 
 </script>
 
