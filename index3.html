@@ -9,6 +9,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
 
+    <!-- LEAFLET -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
+
     <style>
         .row {
             margin-bottom: 0px;
@@ -28,6 +32,23 @@
 
         i {
             margin-top: 10px;
+        }
+
+        .leaflet-control-attribution {
+            display: none;
+        }
+
+        .textArea {
+            background-color: white;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            width: 20em;
+            height: 4em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
         }
     </style>
 </head>
@@ -58,22 +79,40 @@
 </body>
 
 <script>
+    
+    $("#mapDiv").click(function () {
+        $("#mapDiv").removeClass("s9").addClass("s6");
+        $("#chartDiv").removeClass("s3").addClass("s6");
+        resizeSVG();
+        plotLine("2020-05-25", "China");
+    });
 
-    Promise.all([d3.json("covid_data_2.json")]).then(data => {
+    $("#chartDiv").click(function () {
+        $("#mapDiv").removeClass("s6").addClass("s9");
+        $("#chartDiv").removeClass("s6").addClass("s3");
+        resizeSVG();
+        plotBar();
+    });
 
-        $("#mapDiv").click(function () {
-            $("#mapDiv").removeClass("s9").addClass("s6");
-            $("#chartDiv").removeClass("s3").addClass("s6");
-            var dimensions = resizeSVG();
-            plotLine(data[0], "2020-05-25", "China", dimensions);
-        });
-
-        $("#chartDiv").click(function () {
-            $("#mapDiv").removeClass("s6").addClass("s9");
-            $("#chartDiv").removeClass("s6").addClass("s3");
-            resizeSVG();
-            plotBar();
-        });
+    $(function () {
+        var isDragging = false;
+        $("#mapDiv")
+            .mousedown(function () {
+                $(window).mousemove(function () {
+                    isDragging = true;
+                    $(window).unbind("mousemove");
+                });
+            })
+            .mouseup(function () {
+                var wasDragging = isDragging;
+                isDragging = false;
+                $(window).unbind("mousemove");
+                if (!wasDragging) {
+                    $("#mapDiv").removeClass("s9").addClass("s6")
+                    $("#chartDiv").removeClass("s3").addClass("s6")
+                    plotLine("2020-05-25", "China");
+                }
+            });
     });
 
     function initSVG(data) {
@@ -100,6 +139,118 @@
     }
 
     function plotMap() {
+        var zoomed = false;
+        var mapDiv = document.getElementById('mapDiv');
+        var map = L.map(mapDiv, {
+            zoomSnap: 0.25,
+            zoomDelta: 1,
+            wheelPxPerZoomLevel: 60
+        }).setView([45, 10], 2);
+        // zoomsnap = 0.1
+
+
+        // add openstreetmap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxzoom: 12,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        $.getJSON("countries.geojson", (data) => {
+            var geojson = L.geoJSON(data, {
+                onEachFeature: function (feature, layer) {
+                    // on hover highlight country
+                    layer.on({
+                        mouseover: function (e) {
+                            if (!zoomed) {
+                                layer.setStyle({
+                                    fillColor: "#ffffff",
+                                    weight: 2,
+                                    opacity: 1,
+                                    color: 'blue',
+                                    fillOpacity: 0.1
+                                });
+                                $(".textArea").html(feature.properties.ADMIN);
+                                if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                                    layer.bringToFront();
+                                }
+                            }
+                        },
+                        mouseout: function (e) {
+                            if (!zoomed) {
+                                layer.setStyle({
+                                    fillColor: "#ffffff",
+                                    weight: 1,
+                                    opacity: 1,
+                                    color: 'black',
+                                    fillOpacity: 0.1
+                                });
+                            }
+
+                        },
+                        click: function (e) {
+                            zoomed = true;
+                            map.dragging.enable();
+                            map.scrollWheelZoom.enable();
+                            layer.setStyle({
+                                fillColor: "#ffffff",
+                                weight: 2,
+                                opacity: 1,
+                                color: 'blue',
+                                fillOpacity: 0.1
+                            });
+                            // boxzoom to the country
+
+                            map.fitBounds(layer.getBounds());
+                        }
+                    });
+                },
+                style: {
+                    fillColor: "#ffffff",
+                    weight: 1,
+                    opacity: 1,
+                    color: 'black',
+                    fillOpacity: 0.1
+                }
+            })
+
+            // white div bottom right
+            var textArea = L.control({ position: 'bottomright' });
+            textArea.onAdd = function (map) {
+                this._div = L.DomUtil.create('div', 'textArea');
+
+                return this._div;
+            };
+            textArea.addTo(map);
+
+            // reset map to initial view
+            $("#chartDiv").click(function () {
+                zoomed = false;
+                map.dragging.disable();
+                map.scrollWheelZoom.disable();
+                map.setView([45, 10], 2);
+
+                geojson.eachLayer(function (layer) {
+                    layer.setStyle({
+                        fillColor: "#ffffff",
+                        weight: 1,
+                        opacity: 1,
+                        color: 'black',
+                        fillOpacity: 0.1
+                    });
+                });
+
+            })
+
+            // disable zoom and panning by default
+            map.dragging.disable();
+            map.scrollWheelZoom.disable();
+
+            // remove zoomControl
+            map.zoomControl.remove();
+
+            geojson.addTo(map);
+            map.addLayer(geojson);
+        });
 
     }
 
@@ -107,83 +258,92 @@
         d3.selectAll("#chart > *").remove();
     }
 
-    function plotLine(data, date, country, dimensions) {
+    function plotLine(date, country) {
+        var dimensions = resizeSVG();
 
         let margin = dimensions.margin;
         let height = dimensions.height;
         let width = dimensions.width;
         let attribute = "total_cases"
 
-        let cloneData = JSON.parse(JSON.stringify(data));
+        Promise.all([d3.json("covid_data_2.json")]).then(data => {
 
-        var latestDate = new Date(date);
-        cloneData = cloneData[country].filter(d => {
-            let date = new Date(d.date);
-            return (date <= latestDate);
+            let cloneData = data[0];
+
+            var latestDate = new Date(date);
+            cloneData = cloneData[country].filter(d => {
+                let date = new Date(d.date);
+                return (date <= latestDate);
+            });
+
+            var parseDate = d3.timeParse("%Y-%m-%d");
+            cloneData.forEach(function (d) {
+                d.date = parseDate(d.date);
+            });
+
+            var lineChart = d3.select("#chart")
+                .attr("preserveAspectRatio", "xMidYMid meet")
+                .attr(
+                    'viewBox',
+                    '0 0 ' +
+                    (width + margin.left + margin.right) +
+                    ' ' +
+                    (height + margin.top + margin.bottom)
+                )
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            // Add title
+            lineChart.append("text")
+                .attr("x", width / 2)
+                .attr("y", 0)
+                .attr("text-anchor", "middle")
+                .style("font-size", "16px")
+                .text(country + "\n " + attribute.replace("_", " "));
+
+            // Add scales
+            var xScale = d3.scaleTime()
+                .domain(d3.extent(cloneData, function (d) { return d.date; }))
+                .range([0, width]);
+
+            var yScale = d3.scaleLinear()
+                .domain([0, d3.max(cloneData, function (d) { return +d[attribute]; })])
+                .range([height, 0]);
+
+            // Add x-axis
+            lineChart.append("g")
+                .data(cloneData)
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(xScale)
+                    .tickFormat(d3.timeFormat("%Y-%m-%d"))
+                )
+                .selectAll("text")
+                .style("text-anchor", "end")
+                .attr("transform", "rotate(-38)");
+
+            // Add y-axis
+            lineChart.append("g")
+                .attr("class", "y axis")
+                .call(d3.axisLeft(yScale));
+
+            // Draw
+            lineChart.append("path")
+                .datum(cloneData)
+                .attr("fill", "none")
+                .attr("stroke", "royalblue")
+                .attr("stroke-width", 1.5)
+                .attr("d", d3.line()
+                    .x(function (d) { return xScale(d.date) })
+                    .y(function (d) { return yScale(+d[attribute]) })
+                )
+            return;
+
+
         });
 
-        var parseDate = d3.timeParse("%Y-%m-%d");
-        cloneData.forEach(function (d) {
-            d.date = parseDate(d.date);
-        });
 
-        var lineChart = d3.select("#chart")
-            .attr("preserveAspectRatio", "xMidYMid meet")
-            .attr(
-                'viewBox',
-                '0 0 ' +
-                (width + margin.left + margin.right) +
-                ' ' +
-                (height + margin.top + margin.bottom)
-            )
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        // Add title
-        lineChart.append("text")
-            .attr("x", width / 2)
-            .attr("y", 0)
-            .attr("text-anchor", "middle")
-            .style("font-size", "16px")
-            .text(country + "\n " + attribute.replace("_", " "));
-
-        // Add scales
-        var xScale = d3.scaleTime()
-            .domain(d3.extent(cloneData, function (d) { return d.date; }))
-            .range([0, width]);
-
-        var yScale = d3.scaleLinear()
-            .domain([0, d3.max(cloneData, function (d) { return +d[attribute]; })])
-            .range([height, 0]);
-
-        // Add x-axis
-        lineChart.append("g")
-            .data(cloneData)
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(xScale)
-                .tickFormat(d3.timeFormat("%Y-%m-%d"))
-            )
-            .selectAll("text")
-            .style("text-anchor", "end")
-            .attr("transform", "rotate(-38)");
-
-        // Add y-axis
-        lineChart.append("g")
-            .attr("class", "y axis")
-            .call(d3.axisLeft(yScale));
-
-        // Draw
-        lineChart.append("path")
-            .datum(cloneData)
-            .attr("fill", "none")
-            .attr("stroke", "royalblue")
-            .attr("stroke-width", 1.5)
-            .attr("d", d3.line()
-                .x(function (d) { return xScale(d.date) })
-                .y(function (d) { return yScale(+d[attribute]) })
-            )
-        return;
     }
 
 </script>
