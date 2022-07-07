@@ -1,105 +1,259 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-        <script src="https://d3js.org/d3.v7.min.js"></script>
-    
-        <style>
-            .row{
-                margin-bottom: 0px;
-            }
-            .col{
-                height: 100%;
-            }
-            #firstRow{
-                height: 7vh;
-            }
-            #secondRow{
-                height:93vh;
-            }
-            i{
-                margin-top: 10px;
-            }
-            
-        </style>
-    </head>
-    <body>
-        <div class="row" id="firstRow" style="border-style:dotted">
-            <!-- Top Nav bar (Play, Search, Timestamp) -->
-            <div class="col s1 offset-s1" style="border-style:dotted">
-                <i class="medium material-icons">play_arrow</i>
-            </div>
-            <div class="col s6 offset-s1" style="border-style:dotted">
-                <p>Search</p>
-            </div>
-            <div class="col s1 offset-s1" style="border-style:dotted">
-                <p>1/1/2020</p>
-            </div>
-        </div>
-        <div class="row" id="secondRow">
-            <div class="col s9" id="mapDiv" style="border-style:dotted">
-                <!-- Map here -->
-            </div>
-            <div class="col s3" id="chartDiv" style="border-style:dotted">
-                <!-- Bar/line chart here -->
-                <svg id="chart" style="border-style:dotted"></svg>
-            </div>
-        </div>
-        
-    </body>
-    <script>
-        initSVG();
 
-        function initSVG(){
-            resizeSVG()
-            plotMap()
-            plotBar()
+<head>
+    <meta charset="UTF-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <!-- LEAFLET -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
+
+    <style>
+        .row {
+            margin-bottom: 0px;
         }
-        
-        function resizeSVG(){
-            var element = document.getElementById('chartDiv');
-            var positionInfo = element.getBoundingClientRect();
-            var height = positionInfo.height;
-            var width = positionInfo.width;
-        
-            let margin = {top: 20, right: 20, bottom: 20, left: 20};
-            width = width - margin.left - margin.right,
+
+        .col {
+            height: 100%;
+        }
+
+        #firstRow {
+            height: 7vh;
+        }
+
+        #secondRow {
+            height: 93vh;
+        }
+
+        i {
+            margin-top: 10px;
+        }
+
+        .leaflet-control-attribution {
+            display: none;
+        }
+
+        .textArea {
+            background-color: white;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            width: 20em;
+            height: 4em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="row" id="firstRow" style="border-style:dotted">
+        <!-- Top Nav bar (Play, Search, Timestamp) -->
+        <div class="col s1 offset-s1" style="border-style:dotted">
+            <i class="medium material-icons">play_arrow</i>
+        </div>
+        <div class="col s6 offset-s1" style="border-style:dotted">
+            <p>Search</p>
+        </div>
+        <div class="col s1 offset-s1" style="border-style:dotted">
+            <p>1/1/2020</p>
+        </div>
+    </div>
+    <div class="row" id="secondRow">
+        <div class="col s9" id="mapDiv" style="border-style:dotted">
+
+        </div>
+        <div class="col s3" id="chartDiv" style="border-style:dotted">
+            <!-- Bar/line chart here -->
+            <svg id="chart" style="border-style:dotted"></svg>
+        </div>
+    </div>
+
+</body>
+<script>
+
+    function resizeSVG() {
+        var element = document.getElementById('chartDiv');
+        var positionInfo = element.getBoundingClientRect();
+        var height = positionInfo.height;
+        var width = positionInfo.width;
+
+        let margin = { top: 20, right: 20, bottom: 20, left: 20 };
+        width = width - margin.left - margin.right,
             height = height - margin.top - margin.bottom;
 
-            d3.select("#chart")
-            .style("height",height)
-            .style("width",width)
-        }
+        d3.select("#chart")
+            .style("height", height)
+            .style("width", width)
+    }
 
-        $( "#mapDiv" ).click(function() {
-            $("#mapDiv").removeClass("s9").addClass("s6")
-            $("#chartDiv").removeClass("s3").addClass("s6")
-            resizeSVG()
-            plotLine();
+    $(function () {
+        var isDragging = false;
+        $("#mapDiv")
+            .mousedown(function () {
+                $(window).mousemove(function () {
+                    isDragging = true;
+                    $(window).unbind("mousemove");
+                });
+            })
+            .mouseup(function () {
+                var wasDragging = isDragging;
+                isDragging = false;
+                $(window).unbind("mousemove");
+                if (!wasDragging) {
+                    $("#mapDiv").removeClass("s9").addClass("s6")
+                    $("#chartDiv").removeClass("s3").addClass("s6")
+                    resizeSVG()
+                    plotLine();
+                }
+            });
+    });
+
+    $("#chartDiv").click(function () {
+        $("#mapDiv").removeClass("s6").addClass("s9")
+        $("#chartDiv").removeClass("s6").addClass("s3")
+        resizeSVG()
+        plotBar()
+    });
+
+    function plotMap() {
+        var zoomed = false;
+        var mapDiv = document.getElementById('mapDiv');
+        var map = L.map(mapDiv, {
+            zoomSnap: 0.25,
+            zoomDelta: 1,
+            wheelPxPerZoomLevel: 60
+        }).setView([45, 10], 2);
+        // zoomsnap = 0.1
+
+
+        // add openstreetmap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxzoom: 12,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        $.getJSON("countries.geojson", (data) => {
+            var geojson = L.geoJSON(data, {
+                onEachFeature: function (feature, layer) {
+                    // on hover highlight country
+                    layer.on({
+                        mouseover: function (e) {
+                            if (!zoomed) {
+                                layer.setStyle({
+                                    fillColor: "#ffffff",
+                                    weight: 2,
+                                    opacity: 1,
+                                    color: 'blue',
+                                    fillOpacity: 0.1
+                                });
+                                $(".whiteDiv").html(feature.properties.ADMIN);
+                                if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                                    layer.bringToFront();
+                                }
+                            }
+                        },
+                        mouseout: function (e) {
+                            if (!zoomed) {
+                                layer.setStyle({
+                                    fillColor: "#ffffff",
+                                    weight: 1,
+                                    opacity: 1,
+                                    color: 'black',
+                                    fillOpacity: 0.1
+                                });
+                            }
+
+                        },
+                        click: function (e) {
+                            zoomed = true;
+                            map.dragging.enable();
+                            map.scrollWheelZoom.enable();
+                            layer.setStyle({
+                                fillColor: "#ffffff",
+                                weight: 2,
+                                opacity: 1,
+                                color: 'blue',
+                                fillOpacity: 0.1
+                            });
+                            // boxzoom to the country
+
+                            map.fitBounds(layer.getBounds());
+                        }
+                    });
+                },
+                style: {
+                    fillColor: "#ffffff",
+                    weight: 1,
+                    opacity: 1,
+                    color: 'black',
+                    fillOpacity: 0.1
+                }
+            })
+
+            // white div bottom right
+            var textArea = L.control({ position: 'bottomright' });
+            textArea.onAdd = function (map) {
+                this._div = L.DomUtil.create('div', 'whiteDiv');
+
+                return this._div;
+            };
+            textArea.addTo(map);
+
+            // reset map to initial view
+            $("#chartDiv").click(function () {
+                zoomed = false;
+                map.dragging.disable();
+                map.scrollWheelZoom.disable();
+                map.setView([45, 10], 2);
+
+                geojson.eachLayer(function (layer) {
+                    layer.setStyle({
+                        fillColor: "#ffffff",
+                        weight: 1,
+                        opacity: 1,
+                        color: 'black',
+                        fillOpacity: 0.1
+                    });
+                });
+
+            })
+
+            // disable zoom and panning by default
+            map.dragging.disable();
+            map.scrollWheelZoom.disable();
+
+            // remove zoomControl
+            map.zoomControl.remove();
+
+            geojson.addTo(map);
+            map.addLayer(geojson);
         });
 
-        $( "#chartDiv" ).click(function() {
-            $("#mapDiv").removeClass("s6").addClass("s9")
-            $("#chartDiv").removeClass("s6").addClass("s3")
-            resizeSVG()
-            plotBar()
-        });
+    }
 
-        function plotMap(){
 
-        }
+    function plotBar() {
 
-        function plotBar(){
-            
-        }
+    }
 
-        function plotLine(){
+    function plotLine() {
 
-        }
+    }
 
-    </script>
+    $(document).ready(function () {
+        resizeSVG()
+        plotMap()
+        plotBar()
+    });
+
+</script>
+
 </html>
