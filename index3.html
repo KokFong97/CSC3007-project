@@ -90,12 +90,18 @@
         }]
     }
 
+    obj2 = [{"country":"Singapore","total_cases":500},
+            {"country":"China","total_cases":1000},
+            
+    ]
+
     initSVG();
 
     function initSVG() {
         var dimension = resizeSVG();
-        plotMap()
-        plotLine(obj, "2020-01-03", "china", dimension.height, dimension.width)
+        // plotMap()
+        plotBar(obj2,dimension.height,dimension.width)
+        // plotLine(obj, "2020-01-03", "china", dimension.height, dimension.width)
     }
 
     function resizeSVG() {
@@ -105,8 +111,8 @@
         var width = positionInfo.width;
 
         let margin = { top: 20, right: 20, bottom: 20, left: 20 };
-            width = width - margin.left - margin.right,
-            height = height - margin.top - margin.bottom;
+            width = width - margin.left,
+            height = height - margin.top ;
 
         d3.select("#chart")
             .style("height", height)
@@ -125,15 +131,56 @@
     $("#chartDiv").click(function () {
         $("#mapDiv").removeClass("s6").addClass("s9")
         $("#chartDiv").removeClass("s6").addClass("s3")
-        resizeSVG()
-        plotBar()
+        var dimension = resizeSVG()
+        plotBar(obj2,dimension.height,dimension.width)
     });
 
     function plotMap() {
 
     }
 
-    function plotBar() {
+    function getTopTenCountries(date){
+        
+    }
+
+    function plotBar(data,height, width) {
+        var svg = d3.select("#chart")
+        .append("g")
+            .attr("transform",
+                "translate(" + 60 + "," + 20 + ")");
+
+        // Add X axis
+        height = Math.ceil(height-60)
+        width = Math.ceil(width-80)
+        var x = d3.scaleLinear()
+            .domain([0, 2000])
+            .range([ 0, width]);
+        svg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x))
+            .selectAll("text")
+            .attr("transform", "translate(-10,0)rotate(-45)")
+            .style("text-anchor", "end");
+
+        // Y axis
+        var y = d3.scaleBand()
+            .range([ 0, height ])
+            .domain(data.map( d => { return d.country; }))
+            .padding(.1);
+        svg.append("g")
+            .call(d3.axisLeft(y))
+
+        //Bars
+        svg.selectAll(".myRect")
+            .data(data)
+            .enter()
+            .append("rect")
+            .style("display",d=>{return d.total_cases})
+            .attr("x", x(0) )
+            .attr("y", function(d) { return y(d.country); })
+            .attr("width", function(d){; return x(d.total_cases)})
+            .attr("height", y.bandwidth() )
+            .attr("fill", "#69b3a2")
 
     }
 
