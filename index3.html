@@ -79,6 +79,8 @@
 </body>
 
 <script>
+
+    initSVG()
     
     $("#mapDiv").click(function () {
         $("#mapDiv").removeClass("s9").addClass("s6");
@@ -115,7 +117,7 @@
             });
     });
 
-    function initSVG(data) {
+    function initSVG() {
         plotMap();
         plotBar();
         return resizeSVG();
