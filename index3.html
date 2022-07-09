@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
 
+
     <style>
         .row {
             margin-bottom: 0px;
@@ -114,15 +115,63 @@
     })
 
     // Test data dont delete -kf
-    obj2 = [{"country":"Singapore","total_cases":500},
-            {"country":"China","total_cases":1000},
-            
+    obj2 = [{ "country": "Singapore", "total_cases": 500 },
+    { "country": "China", "total_cases": 1000 },
+
     ]
+    var geojson;
+    test_data1 = {
+        "China": {
+            "total_cases": 78824.0
+        },
+        "India": {
+            "total_cases": 50824.0
+        }
+    }
+
+    test_data2 = {
+        "China": {
+            "total_cases": 28824.0
+        },
+        "India": {
+            "total_cases": 10824.0
+        }
+    }
+
+    test_data3 = {
+        "China": {
+            "total_cases": 8824.0
+        },
+        "India": {
+            "total_cases": 524.0
+        }
+    }
+    last_data = {}
+
+    // after geojson is loaded 
+
+
+
 
     function initSVG(data) {
-        plotMap(data[1]);
+        geojson = plotMap(data[1], test_data1);
         plotBar(obj2);
+        $.getJSON("covid_data.json", function (data) {
+            // for each key in data 
+
+            for (var key in data) {
+                // delay for 1 second
+
+                setTimeout(function (key) {
+                    updateMap(data[key]);
+                }, 2000, key);
+
+
+            }
+
+        });
         return resizeSVG();
+
     }
 
     function resizeSVG() {
@@ -142,8 +191,61 @@
 
         return { margin: margin, height: height, width: width }
     }
+    // updateMap function that takes in a list of country ISO and data to plot the map as heatmap
+    function updateMap(current_data) {
+        last_data = current_data
+        geojson.eachLayer(function (featureInstanceLayer) {
+            if (current_data[featureInstanceLayer.feature.properties.ADMIN]) {
+                featureInstanceLayer.setStyle({
+                    fillColor: getColor(featureInstanceLayer.feature.properties.ADMIN, current_data),
+                    color: '#000000',
+                    weight: 1,
+                    fillOpacity: 1
+                });
+            }
+            else {
+                featureInstanceLayer.setStyle({
+                    fillColor: '#ffffff',
+                    color: '#000000',
+                    weight: 1,
+                    fillOpacity: 1
+                });
+            }
+        });
+    }
+    function getColor(feature, last_data) {
+        if (last_data[feature]) {
+            total_cases = last_data[feature]["total_cases"];
+            if (total_cases > 0 && total_cases <= 10) {
+                return "#00ff04";
+            } else if (total_cases > 10 && total_cases <= 100) {
+                return "#66ff00";
+            } else if (total_cases > 100 && total_cases <= 1000) {
+                return "#9cff00";
+            } else if (total_cases > 1000 && total_cases <= 5000) {
+                return "#c7ff00";
+            } else if (total_cases > 5000 && total_cases <= 10000) {
+                return "#f3ff00";
+            } else if (total_cases > 10000 && total_cases <= 20000) {
+                return "#ffdb00";
+            } else if (total_cases > 20000 && total_cases <= 30000) {
+                return "#ffbe00";
+            } else if (total_cases > 30000 && total_cases <= 50000) {
+                return "#ff9700";
+            } else if (total_cases > 50000 && total_cases <= 70000) {
+                return "#ff6b00";
+            } else if (total_cases > 70000 && total_cases <= 100000) {
+                return "#ff4e00";
+            } else if (total_cases > 100000) {
+                return "#ff0000";
+            }
+        } else {
+            return "#ffffff";
+        }
+    }
 
-    function plotMap(data) {
+    function plotMap(data, current_data) {
+        last_data = current_data
         var zoomed = false;
         var mapDiv = document.getElementById('mapDiv');
         var map = L.map(mapDiv, {
@@ -159,21 +261,24 @@
             maxzoom: 12,
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
-
-        var geojson = L.geoJSON(data, {
+        console.log(last_data)
+        geojson = L.geoJSON(data, {
             onEachFeature: function (feature, layer) {
-                // on hover highlight country
                 layer.on({
                     mouseover: function (e) {
                         if (!zoomed) {
                             layer.setStyle({
-                                fillColor: "#ffffff",
+                                fillColor: getColor(feature.properties.ADMIN, last_data),
                                 weight: 2,
                                 opacity: 1,
                                 color: 'blue',
-                                fillOpacity: 0.1
+                                fillOpacity: 1
                             });
-                            $(".textArea").html(feature.properties.ADMIN);
+                            if (last_data[feature.properties.ADMIN])
+                                $(".textArea").html(feature.properties.ADMIN + ": " + last_data[feature.properties.ADMIN]["total_cases"] + " cases");
+                            else {
+                                $(".textArea").html(feature.properties.ADMIN)
+                            }
                             if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
                                 layer.bringToFront();
                             }
@@ -182,11 +287,11 @@
                     mouseout: function (e) {
                         if (!zoomed) {
                             layer.setStyle({
-                                fillColor: "#ffffff",
+                                fillColor: getColor(feature.properties.ADMIN, last_data),
                                 weight: 1,
                                 opacity: 1,
                                 color: 'black',
-                                fillOpacity: 0.1
+                                fillOpacity: 1
                             });
                         }
 
@@ -196,25 +301,29 @@
                         map.dragging.enable();
                         map.scrollWheelZoom.enable();
                         layer.setStyle({
-                            fillColor: "#ffffff",
+                            fillColor: getColor(feature.properties.ADMIN, last_data),
                             weight: 2,
                             opacity: 1,
                             color: 'blue',
-                            fillOpacity: 0.1
+                            fillOpacity: 1
                         });
-                        // boxzoom to the country
+
+                        // GET COUNTRY NAME ON CLICK
+                        // feature.properties.ADMIN
+
 
                         map.fitBounds(layer.getBounds());
                     }
-                });
-            },
-            style: {
-                fillColor: "#ffffff",
-                weight: 1,
-                opacity: 1,
-                color: 'black',
-                fillOpacity: 0.1
+                }),
+                    layer.setStyle({
+                        fillColor: getColor(feature.properties.ADMIN, last_data),
+                        weight: 1,
+                        opacity: 1,
+                        color: 'black',
+                        fillOpacity: 1
+                    });
             }
+
         })
 
         // white div bottom right
@@ -224,7 +333,7 @@
 
             return this._div;
         };
-        textArea.addTo(map);
+        textArea.addTo(map)
 
         // reset map to initial view
         $("#chartDiv").click(function () {
@@ -235,14 +344,15 @@
 
             geojson.eachLayer(function (layer) {
                 layer.setStyle({
-                    fillColor: "#ffffff",
+                    fillColor: getColor(layer.feature.properties.ADMIN, last_data),
                     weight: 1,
                     opacity: 1,
                     color: 'black',
-                    fillOpacity: 0.1
+                    fillOpacity: 1
                 });
             });
         })
+
 
         // disable zoom and panning by default
         map.dragging.disable();
@@ -254,6 +364,7 @@
         geojson.addTo(map);
         map.addLayer(geojson);
 
+        return geojson
     }
 
     function plotBar(data) {
@@ -262,19 +373,18 @@
         let height = dimension.height;
         let width = dimension.width;
 
-        console.log(dimension)
 
         var svg = d3.select("#chart")
-        .append("g")
+            .append("g")
             .attr("transform",
                 "translate(" + 60 + "," + 20 + ")");
 
         // Add X axis
-        height = Math.ceil(height-60)
-        width = Math.ceil(width-100)
+        height = Math.ceil(height - 60)
+        width = Math.ceil(width - 100)
         var x = d3.scaleLinear()
             .domain([0, 2000])
-            .range([ 0, width]);
+            .range([0, width]);
         svg.append("g")
             .attr("transform", "translate(0," + height + ")")
             .call(d3.axisBottom(x))
@@ -284,8 +394,8 @@
 
         // Y axis
         var y = d3.scaleBand()
-            .range([ 0, height ])
-            .domain(data.map( d => { return d.country; }))
+            .range([0, height])
+            .domain(data.map(d => { return d.country; }))
             .padding(.1);
         svg.append("g")
             .call(d3.axisLeft(y))
@@ -295,11 +405,11 @@
             .data(data)
             .enter()
             .append("rect")
-            .style("display",d=>{return d.total_cases})
-            .attr("x", x(0) )
-            .attr("y", function(d) { return y(d.country); })
-            .attr("width", function(d){; return x(d.total_cases)})
-            .attr("height", y.bandwidth() )
+            .style("display", d => { return d.total_cases })
+            .attr("x", x(0))
+            .attr("y", function (d) { return y(d.country); })
+            .attr("width", function (d) { ; return x(d.total_cases) })
+            .attr("height", y.bandwidth())
             .attr("fill", "#69b3a2")
     }
 
