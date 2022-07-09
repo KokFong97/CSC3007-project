@@ -92,26 +92,26 @@
             plotBar(obj2);
         });
 
-        $(function () {
-            var isDragging = false;
-            $("#mapDiv")
-                .mousedown(function () {
-                    $(window).mousemove(function () {
-                        isDragging = true;
-                        $(window).unbind("mousemove");
-                    });
-                })
-                .mouseup(function () {
-                    var wasDragging = isDragging;
-                    isDragging = false;
-                    $(window).unbind("mousemove");
-                    if (!wasDragging) {
-                        $("#mapDiv").removeClass("s9").addClass("s6")
-                        $("#chartDiv").removeClass("s3").addClass("s6")
-                        plotLine(data[0], "2020-05-25", "Antigua and Barbuda");
-                    }
-                });
-        });
+        // Is this still needed?
+
+        // $(function () {
+        //     var isDragging = false;
+        //     $("#mapDiv")
+        //         .mousedown(function () {
+        //             $(window).mousemove(function () {
+        //                 isDragging = true;
+        //                 $(window).unbind("mousemove");
+        //             });
+        //         })
+        //         .mouseup(function () {
+        //             var wasDragging = isDragging;
+        //             isDragging = false;
+        //             $(window).unbind("mousemove");
+        //             if (!wasDragging) {
+
+        //             }
+        //         });
+        // });
     })
 
     // Test data dont delete -kf
@@ -154,7 +154,7 @@
 
 
     function initSVG(data) {
-        geojson = plotMap(data[1], test_data1);
+        geojson = plotMap(data[0], data[1], test_data1);
         plotBar(obj2);
         $.getJSON("covid_data.json", function (data) {
             // for each key in data 
@@ -191,6 +191,7 @@
 
         return { margin: margin, height: height, width: width }
     }
+
     // updateMap function that takes in a list of country ISO and data to plot the map as heatmap
     function updateMap(current_data) {
         last_data = current_data
@@ -213,6 +214,7 @@
             }
         });
     }
+
     function getColor(feature, last_data) {
         if (last_data[feature]) {
             total_cases = last_data[feature]["total_cases"];
@@ -244,7 +246,7 @@
         }
     }
 
-    function plotMap(data, current_data) {
+    function plotMap(line_data, data, current_data) {
         last_data = current_data
         var zoomed = false;
         var mapDiv = document.getElementById('mapDiv');
@@ -310,9 +312,8 @@
 
                         // GET COUNTRY NAME ON CLICK
                         // feature.properties.ADMIN
-
-
                         map.fitBounds(layer.getBounds());
+                        plotLine(line_data, "2020-05-25", feature.properties.ADMIN);
                     }
                 }),
                     layer.setStyle({
@@ -415,10 +416,13 @@
 
     function plotLine(data, date, country) {
 
+        $("#mapDiv").removeClass("s9").addClass("s6");
+        $("#chartDiv").removeClass("s3").addClass("s6");
+
         d3.selectAll("#chart > *").remove();
         var dimensions = resizeSVG();
 
-        let margin = dimensions.margin;
+        let margin = { top: 70, right: 80, bottom: 70, left: 80 };
         let height = dimensions.height;
         let width = dimensions.width;
         let attribute = "total_cases";
